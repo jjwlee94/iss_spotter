@@ -1,36 +1,29 @@
-const { fetchISSFlyOverTimes } = require('./iss');
-// 
-// const ip = function(callback) {
-//   // use request to fetch IP address from JSON API
-//     request('https://api.ipify.org?format=json', (error, response, body) => {
-//       if (error) {
-//         return callback(error, null);
-//       }
-//       if (response.statusCode !== 200) {
-//         callback(Error(`Status code ${response.statusCode} when fetching IP: ${body}`), null);
-//       }
-//       const ip = JSON.parse(body).ip;
-//       callback(null, ip);
-//     });
-//   };
-// 
-// fetchCoordsByIP(ip, (error, coordinates) => {
-//   if (error) {
-//     console.log("It didn't work!", error);
-//     return;
-//   }
-// 
-//   console.log('It worked! Returned coordinates:', coordinates);
-// 
-// });
+const { nextISSTimesForMyLocation } = require('./iss');
 
-const exampleCoords = { latitude: '43.6667', longitude: '-79.3804' };
-
-fetchISSFlyOverTimes(exampleCoords, (error, passTimes) => {
-  if (error) {
-    console.log("It didn't work!" , error);
-    return;
+/** 
+ * Input: 
+ *   Array of data objects defining the next fly-overs of the ISS.
+ *   [ { risetime: <number>, duration: <number> }, ... ]
+ * Returns: 
+ *   undefined
+ * Sideffect: 
+ *   Console log messages to make that data more human readable.
+ *   Example output:
+ *   Next pass at Mon Jun 10 2019 20:11:44 GMT-0700 (Pacific Daylight Time) for 468 seconds!
+ */
+const printPassTimes = function(passTimes) {
+  for (const pass of passTimes) {
+    const datetime = new Date(0);
+    datetime.setUTCSeconds(pass.risetime);
+    const duration = pass.duration;
+    console.log(`Next pass at ${datetime} for ${duration} seconds!`);
   }
+};
 
-  console.log('It worked! Returned flyover times:' , passTimes);
+nextISSTimesForMyLocation((error, passTimes) => {
+  if (error) {
+    return console.log("It didn't work!", error);
+  }
+  // success, print out the deets!
+  printPassTimes(passTimes);
 });
